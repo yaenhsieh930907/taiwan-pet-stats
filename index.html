@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>台灣寵物與流浪動物數據報告 · 謝亞恩</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;700&family=Noto+Sans+TC:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #FAF8F3;
+    --warm-white: #FFFEFB;
+    --sand: #F0EBE0;
+    --taupe: #D6CDBC;
+    --stone: #A89880;
+    --bark: #6B5744;
+    --earth: #3D2B1F;
+    --ink: #1A0F0A;
+    --accent-teal: #2A7A6B;
+    --accent-teal-light: #E3F4F0;
+    --accent-amber: #C17B3A;
+    --accent-amber-light: #FDF3E7;
+    --accent-sage: #5A7A5A;
+    --accent-sage-light: #EDF4ED;
+    --accent-rust: #A84C2E;
+    --accent-rust-light: #FBF0EC;
+    --line: rgba(107,87,68,0.15);
+    --line-strong: rgba(107,87,68,0.3);
+    --shadow-soft: 0 2px 20px rgba(61,43,31,0.06);
+    --shadow-card: 0 4px 32px rgba(61,43,31,0.08);
+    --radius: 16px;
+    --radius-sm: 8px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--cream);
+    color: var(--earth);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    background: var(--warm-white);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .hero-bg-circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.04;
+    background: var(--bark);
+  }
+  .hero-bg-circle:nth-child(1) { width: 600px; height: 600px; top: -200px; right: -150px; }
+  .hero-bg-circle:nth-child(2) { width: 400px; height: 400px; bottom: -100px; left: -100px; }
+  .hero-bg-line {
+    position: absolute;
+    width: 1px;
+    background: var(--line-strong);
+    top: 0;
+    bottom: 0;
+    opacity: 0.5;
+  }
+  .hero-bg-line:nth-child(3) { left: 33.3%; }
+  .hero-bg-line:nth-child(4) { left: 66.6%; }
+
+  .hero-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 5%;
+    position: relative;
+    z-index: 10;
+    border-bottom: 1px solid var(--line);
+  }
+  .hero-nav-brand {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    color: var(--stone);
+    text-transform: uppercase;
+  }
+  .hero-nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+  .hero-nav-links a {
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    color: var(--stone);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .hero-nav-links a:hover { color: var(--bark); }
+
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 4rem 5%;
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+  }
+  .hero-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    color: var(--accent-teal);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    background: var(--accent-teal);
+  }
+  .hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    line-height: 1.05;
+    color: var(--ink);
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--accent-teal);
+  }
+  .hero-subtitle {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    color: var(--bark);
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+    line-height: 1.6;
+    max-width: 560px;
+  }
+  .hero-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
+  .hero-author-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--sand);
+    border: 1.5px solid var(--taupe);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 0.9rem;
+    color: var(--bark);
+    flex-shrink: 0;
+  }
+  .hero-author-info { line-height: 1.3; }
+  .hero-author-name {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--earth);
+  }
+  .hero-author-role {
+    font-size: 0.78rem;
+    color: var(--stone);
+    letter-spacing: 0.04em;
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    width: 100%;
+    max-width: 640px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--warm-white);
+  }
+  .hero-stat {
+    padding: 1.5rem;
+    border-right: 1px solid var(--line-strong);
+    position: relative;
+  }
+  .hero-stat:last-child { border-right: none; }
+  .hero-stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+  .hero-stat-label {
+    font-size: 0.72rem;
+    color: var(--stone);
+    letter-spacing: 0.06em;
+  }
+  .hero-stat-unit {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.9rem;
+    color: var(--bark);
+  }
+
+  .hero-bottom {
+    padding: 1.5rem 5%;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+  }
+  .hero-source {
+    font-size: 0.72rem;
+    color: var(--stone);
+    letter-spacing: 0.04em;
+  }
+  .hero-source a {
+    color: var(--accent-teal);
+    text-decoration: none;
+  }
+  .hero-source a:hover { text-decoration: underline; }
+  .scroll-hint {
+    font-size: 0.72rem;
+    color: var(--stone);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    letter-spacing: 0.08em;
+    animation: bounce 2s infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(4px); }
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    padding: 6rem 5%;
+  }
+  .section-alt {
+    background: var(--warm-white);
+  }
+
+  .section-header {
+    margin-bottom: 4rem;
+  }
+  .section-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .section-label::before {
+    content: '';
+    width: 20px;
+    height: 1px;
+    background: var(--accent-teal);
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--ink);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+  .section-desc {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1rem;
+    color: var(--bark);
+    max-width: 560px;
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  /* ── CHART CONTAINERS ── */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  .chart-card {
+    background: var(--warm-white);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    padding: 2rem;
+    box-shadow: var(--shadow-soft);
+    transition: box-shadow 0.3s;
+  }
+  .chart-card:hover { box-shadow: var(--shadow-card); }
+  .chart-card-wide {
+    grid-column: 1 / -1;
+  }
+  .chart-card-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--earth);
+    margin-bottom: 0.4rem;
+  }
+  .chart-card-sub {
+    font-size: 0.75rem;
+    color: var(--stone);
+    letter-spacing: 0.04em;
+    margin-bottom: 1.5rem;
+  }
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+  }
+
+  /* ── INSIGHT CARDS ── */
+  .insight-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .insight-card {
+    background: var(--warm-white);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    padding: 2rem;
+    box-shadow: var(--shadow-soft);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .insight-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+  }
+  .insight-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+  }
+  .insight-card.teal::before { background: var(--accent-teal); }
+  .insight-card.amber::before { background: var(--accent-amber); }
+  .insight-card.sage::before { background: var(--accent-sage); }
+  .insight-card.rust::before { background: var(--accent-rust); }
+
+  .insight-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .insight-card.teal .insight-icon { background: var(--accent-teal-light); }
+  .insight-card.amber .insight-icon { background: var(--accent-amber-light); }
+  .insight-card.sage .insight-icon { background: var(--accent-sage-light); }
+  .insight-card.rust .insight-icon { background: var(--accent-rust-light); }
+
+  .insight-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.4rem;
+    line-height: 1;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+  }
+  .insight-label {
+    font-size: 0.8rem;
+    color: var(--stone);
+    letter-spacing: 0.06em;
+    margin-bottom: 1rem;
+  }
+  .insight-desc {
+    font-size: 0.85rem;
+    color: var(--bark);
+    line-height: 1.65;
+    border-top: 1px solid var(--line);
+    padding-top: 1rem;
+  }
+
+  /* ── COUNTY BAR SECTION ── */
+  .county-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+  .county-bars { padding: 0; }
+  .county-bar-item {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 0.75rem;
+    font-size: 0.82rem;
+  }
+  .county-bar-label {
+    text-align: right;
+    color: var(--earth);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .county-bar-track {
+    height: 8px;
+    background: var(--sand);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .county-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--accent-teal);
+    transition: width 1s ease;
+  }
+  .county-bar-val {
+    color: var(--stone);
+    font-size: 0.75rem;
+    text-align: right;
+    min-width: 50px;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    position: relative;
+    padding-left: 2.5rem;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--taupe);
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 2.5rem;
+    cursor: pointer;
+  }
+  .timeline-dot {
+    position: absolute;
+    left: -2.1rem;
+    top: 0.3rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--warm-white);
+    border: 2px solid var(--taupe);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .timeline-item:hover .timeline-dot,
+  .timeline-item.active .timeline-dot {
+    border-color: var(--accent-teal);
+    background: var(--accent-teal);
+  }
+  .timeline-year {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--stone);
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+  }
+  .timeline-event {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 0.95rem;
+    color: var(--earth);
+    font-weight: 400;
+    margin-bottom: 0.3rem;
+  }
+  .timeline-detail {
+    font-size: 0.8rem;
+    color: var(--stone);
+    line-height: 1.5;
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: var(--bark);
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* ── TABS ── */
+  .tab-nav {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    width: fit-content;
+    margin-bottom: 2rem;
+  }
+  .tab-btn {
+    padding: 0.6rem 1.4rem;
+    font-size: 0.8rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--stone);
+    letter-spacing: 0.04em;
+    border-right: 1px solid var(--line-strong);
+    transition: background 0.15s, color 0.15s;
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+  .tab-btn:last-child { border-right: none; }
+  .tab-btn:hover { background: var(--sand); color: var(--earth); }
+  .tab-btn.active {
+    background: var(--earth);
+    color: var(--cream);
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--ink);
+    color: var(--stone);
+    padding: 3rem 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+  .footer-brand {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.2rem;
+    color: var(--cream);
+    margin-bottom: 0.5rem;
+  }
+  .footer-source {
+    font-size: 0.75rem;
+    color: var(--stone);
+    line-height: 1.8;
+  }
+  .footer-source a {
+    color: var(--taupe);
+    text-decoration: none;
+  }
+  .footer-source a:hover {
+    color: var(--cream);
+    text-decoration: underline;
+  }
+  .footer-meta {
+    font-size: 0.72rem;
+    color: rgba(168,152,128,0.5);
+    text-align: right;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 0;
+  }
+
+  /* ── ANIMATIONS ── */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .chart-grid { grid-template-columns: 1fr; }
+    .chart-card-wide { grid-column: auto; }
+    .county-section { grid-template-columns: 1fr; }
+    .hero-stats { grid-template-columns: 1fr; }
+    .hero-stat { border-right: none; border-bottom: 1px solid var(--line-strong); }
+    .hero-stat:last-child { border-bottom: none; }
+    .hero-nav-links { display: none; }
+    .footer { flex-direction: column; }
+    .footer-meta { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-bg-circle"></div>
+    <div class="hero-bg-circle"></div>
+    <div class="hero-bg-line"></div>
+    <div class="hero-bg-line"></div>
+  </div>
+
+  <nav class="hero-nav">
+    <div class="hero-nav-brand">農業部開放資料 · 報告</div>
+    <ul class="hero-nav-links">
+      <li><a href="#trends">趨勢分析</a></li>
+      <li><a href="#regional">地區分布</a></li>
+      <li><a href="#stray">流浪犬統計</a></li>
+      <li><a href="#about">關於</a></li>
+    </ul>
+  </nav>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">2001–2024 · 台灣寵物資料</div>
+    <h1 class="hero-title">台灣<br><em>犬貓數據</em><br>全紀錄</h1>
+    <p class="hero-subtitle">橫跨民國 90 年至 113 年，涵蓋全台 22 縣市的犬貓登記數、貓隻推算數與流浪犬隻統計，見證台灣寵物文化的完整演進。</p>
+    <div class="hero-author">
+      <div class="hero-author-avatar">謝</div>
+      <div class="hero-author-info">
+        <div class="hero-author-name">謝亞恩</div>
+        <div class="hero-author-role">資料分析 · 視覺化設計</div>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">367 <span class="hero-stat-unit">筆</span></div>
+        <div class="hero-stat-label">資料記錄總數</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">22 <span class="hero-stat-unit">縣市</span></div>
+        <div class="hero-stat-label">涵蓋行政區域</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">24 <span class="hero-stat-unit">年</span></div>
+        <div class="hero-stat-label">資料時間跨距</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-bottom">
+    <div class="hero-source">
+      資料來源：農業部，政府資料開放平台，<a href="https://data.gov.tw/dataset/41771" target="_blank">https://data.gov.tw/dataset/41771</a>
+    </div>
+    <div class="scroll-hint">向下探索 ↓</div>
+  </div>
+</section>
+
+<!-- KEY INSIGHTS -->
+<section class="section" id="trends">
+  <div class="section-header fade-in">
+    <div class="section-label">關鍵洞察</div>
+    <h2 class="section-title">四大核心指標</h2>
+    <p class="section-desc">從登記資料提取最具代表性的數字，呈現台灣寵物生態的現況與歷史。</p>
+  </div>
+  <div class="insight-grid">
+    <div class="insight-card teal fade-in">
+      <div class="insight-icon">🐕</div>
+      <div class="insight-num">148.1<small style="font-size:1rem">萬</small></div>
+      <div class="insight-label">112年登記犬隻數（最近一筆）</div>
+      <div class="insight-desc">民國 112 年全台登記犬隻達 148 萬餘頭，相較民國 90 年的 179 萬頭略有下降，但家庭型寵物犬的比例顯著提升。</div>
+    </div>
+    <div class="insight-card amber fade-in">
+      <div class="insight-icon">🐱</div>
+      <div class="insight-num">131.1<small style="font-size:1rem">萬</small></div>
+      <div class="insight-label">112年推算貓隻數（最近一筆）</div>
+      <div class="insight-desc">民國 112 年貓隻推算數首次突破 130 萬大關，較民國 92 年成長逾 4 倍，養貓風潮在台灣持續蓬勃發展。</div>
+    </div>
+    <div class="insight-card rust fade-in">
+      <div class="insight-icon">🏠</div>
+      <div class="insight-num">14.2<small style="font-size:1rem">萬</small></div>
+      <div class="insight-label">113年全台流浪犬隻（最新調查）</div>
+      <div class="insight-desc">民國 113 年流浪犬調查數為 14.1 萬頭，相較民國 90 年的 17.9 萬頭已有明顯改善，顯示政策介入發揮成效。</div>
+    </div>
+    <div class="insight-card sage fade-in">
+      <div class="insight-icon">📈</div>
+      <div class="insight-num">+430<small style="font-size:1rem">%</small></div>
+      <div class="insight-label">貓隻數量成長（92年→112年）</div>
+      <div class="insight-desc">從民國 92 年的約 25 萬頭到 112 年逾 131 萬頭，台灣貓隻數量 20 年間成長超過 4 倍，貓咖啡、貓奴文化蓬勃興起。</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TREND CHARTS -->
+<section class="section section-alt fade-in">
+  <div class="section-header">
+    <div class="section-label">歷年趨勢</div>
+    <h2 class="section-title">犬貓登記數<br>長期演變</h2>
+    <p class="section-desc">從民國 90 年至 112 年，觀察台灣犬貓登記數量的歷史軌跡與交叉趨勢。</p>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card chart-card-wide">
+      <div class="chart-card-title">歷年犬貓登記數對比</div>
+      <div class="chart-card-sub">單位：萬頭 · 民國 90–112 年（偶數年調查）</div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#2A7A6B"></div>登記犬隻數</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#C17B3A"></div>推算貓隻數</div>
+      </div>
+      <div class="chart-wrap" style="height:320px;">
+        <canvas id="trendChart" role="img" aria-label="歷年犬貓登記數趨勢圖，民國90年至112年">犬隻數量從179萬降至148萬，貓隻從25萬增至131萬。</canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-card-title">112年犬貓比例</div>
+      <div class="chart-card-sub">登記數量分布</div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#2A7A6B"></div>犬 53%</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#C17B3A"></div>貓 47%</div>
+      </div>
+      <div class="chart-wrap" style="height:240px;">
+        <canvas id="pieChart" role="img" aria-label="112年犬貓比例圓餅圖">犬隻148萬佔53%，貓隻131萬佔47%。</canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-card-title">流浪犬歷年調查</div>
+      <div class="chart-card-sub">單位：萬頭 · 有資料年份</div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#A84C2E"></div>流浪犬數量</div>
+      </div>
+      <div class="chart-wrap" style="height:240px;">
+        <canvas id="strayChart" role="img" aria-label="歷年流浪犬調查數量">流浪犬從17.9萬高峰逐漸下降至14.2萬。</canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- REGIONAL -->
+<section class="section" id="regional">
+  <div class="section-header fade-in">
+    <div class="section-label">地區分析</div>
+    <h2 class="section-title">113年流浪犬<br>縣市排行</h2>
+    <p class="section-desc">民國 113 年各縣市流浪犬隻數量比較，揭示地區差異與城鄉分布特徵。</p>
+  </div>
+
+  <div class="county-section fade-in">
+    <div>
+      <div class="chart-card">
+        <div class="chart-card-title">全台各縣市流浪犬數量（113年）</div>
+        <div class="chart-card-sub">資料：農業部，民國113年調查</div>
+        <div class="chart-wrap" style="height:520px;">
+          <canvas id="countyChart" role="img" aria-label="113年各縣市流浪犬數量橫條圖">台南市19990頭最多，連江縣26頭最少。</canvas>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="margin-bottom:2rem;">
+        <h3 style="font-family:'Noto Serif TC',serif;font-size:1.1rem;color:var(--earth);margin-bottom:0.5rem;">前十縣市詳細排名</h3>
+        <p style="font-size:0.8rem;color:var(--stone);">點選各縣市了解更多</p>
+      </div>
+      <div class="county-bars" id="countyBars"></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TIMELINE / ABOUT -->
+<section class="section section-alt" id="about">
+  <div class="section-header fade-in">
+    <div class="section-label">政策時間軸</div>
+    <h2 class="section-title">台灣動物<br>政策演進</h2>
+    <p class="section-desc">搭配數據脈絡，梳理影響台灣犬貓數量的重要政策節點。</p>
+  </div>
+
+  <div style="max-width:560px;" class="fade-in">
+    <div class="timeline">
+      <div class="timeline-item active">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">民國 90 年 · 2001</div>
+        <div class="timeline-event">首次大規模犬隻登記調查</div>
+        <div class="timeline-detail">全台登記犬隻 179 萬頭，流浪犬達 17.9 萬頭，問題嚴峻。</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">民國 92 年 · 2003</div>
+        <div class="timeline-event">貓隻首次納入調查統計</div>
+        <div class="timeline-detail">農業部開始統計推算貓隻數，首次調查為 24.7 萬頭。</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">民國 104 年 · 2015</div>
+        <div class="timeline-event">《動物保護法》強化修訂</div>
+        <div class="timeline-detail">提高動物虐待刑責，加強收容所管理，同年流浪犬調查 12.8 萬頭。</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">民國 107 年 · 2018</div>
+        <div class="timeline-event">零安樂死政策正式上路</div>
+        <div class="timeline-detail">公立收容所禁止以安樂死方式處理流浪動物，推動 TNR 政策。</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">民國 112 年 · 2023</div>
+        <div class="timeline-event">貓隻數量首破 131 萬頭</div>
+        <div class="timeline-detail">貓隻數量創歷史新高，首度逼近犬隻數量，貓主人佔比持續上升。</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">民國 113 年 · 2024</div>
+        <div class="timeline-event">最新流浪犬調查：14.2 萬頭</div>
+        <div class="timeline-detail">相較最高峰（民國90年）下降 21%，顯示長期政策推動具體成效。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div>
+    <div class="footer-brand">台灣犬貓數據全紀錄</div>
+    <div style="font-size:0.78rem;color:var(--stone);margin-bottom:0.5rem;">作者：謝亞恩</div>
+    <div class="footer-source">
+      資料來源：農業部，政府資料開放平台<br>
+      <a href="https://data.gov.tw/dataset/41771" target="_blank">https://data.gov.tw/dataset/41771</a>
+    </div>
+  </div>
+  <div class="footer-meta">
+    資料涵蓋民國 90–113 年<br>
+    367 筆記錄 · 22 縣市<br>
+    <span style="opacity:0.4;font-size:0.65rem;">© 2024 謝亞恩</span>
+  </div>
+</footer>
+
+<script>
+// ── FADE IN OBSERVER ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// ── DATA ──
+const petYears = [90,92,94,96,98,100,102,104,106,108,110,112];
+const dogCounts = [179.018,135.279,114.649,133.947,123.860,124.793,174.160,171.424,177.725,153.744,123.522,148.064];
+const catCounts = [0,24.757,22.123,28.527,31.124,30.285,57.899,56.794,73.321,76.377,87.081,131.145];
+
+const strayYears = [90,98,104,107,109,111,113];
+const strayCounts = [17.946,8.489,12.847,14.677,15.587,15.870,14.158];
+
+const countyData = [
+  {name:'臺南市',val:19990},{name:'嘉義縣',val:16944},{name:'高雄市',val:10200},
+  {name:'屏東縣',val:10024},{name:'新北市',val:9982},{name:'南投縣',val:9644},
+  {name:'彰化縣',val:9313},{name:'臺東縣',val:8551},{name:'臺中市',val:8542},
+  {name:'桃園市',val:7893},{name:'苗栗縣',val:7403},{name:'花蓮縣',val:6983},
+  {name:'雲林縣',val:4934},{name:'基隆市',val:3112},{name:'新竹縣',val:2396},
+  {name:'臺北市',val:1908},{name:'宜蘭縣',val:1630},{name:'嘉義市',val:906},
+  {name:'澎湖縣',val:520},{name:'新竹市',val:516},{name:'金門縣',val:167},{name:'連江縣',val:26}
+];
+
+const teal = '#2A7A6B', amber = '#C17B3A', rust = '#A84C2E';
+const tealAlpha = 'rgba(42,122,107,0.08)', amberAlpha = 'rgba(193,123,58,0.08)';
+
+// ── TREND CHART ──
+new Chart(document.getElementById('trendChart'), {
+  type: 'line',
+  data: {
+    labels: petYears.map(y => '民' + y),
+    datasets: [
+      {
+        label: '登記犬隻數（萬）',
+        data: dogCounts,
+        borderColor: teal,
+        backgroundColor: tealAlpha,
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: teal,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        borderWidth: 2,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 1.5
+      },
+      {
+        label: '推算貓隻數（萬）',
+        data: catCounts,
+        borderColor: amber,
+        backgroundColor: amberAlpha,
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: amber,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        borderWidth: 2,
+        borderDash: [5,3],
+        pointBorderColor: '#fff',
+        pointBorderWidth: 1.5
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ctx.dataset.label + '：' + ctx.raw.toFixed(1) + ' 萬'
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(107,87,68,0.07)' },
+        ticks: { color: '#A89880', font: { size: 11 } }
+      },
+      y: {
+        grid: { color: 'rgba(107,87,68,0.07)' },
+        ticks: {
+          color: '#A89880',
+          font: { size: 11 },
+          callback: v => v + ' 萬'
+        }
+      }
+    }
+  }
+});
+
+// ── PIE CHART ──
+new Chart(document.getElementById('pieChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['登記犬隻', '推算貓隻'],
+    datasets: [{
+      data: [148.064, 131.145],
+      backgroundColor: [teal, amber],
+      borderColor: '#FFFEFB',
+      borderWidth: 3,
+      hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '62%',
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ctx.label + '：' + ctx.raw.toFixed(1) + ' 萬'
+        }
+      }
+    }
+  }
+});
+
+// ── STRAY CHART ──
+new Chart(document.getElementById('strayChart'), {
+  type: 'bar',
+  data: {
+    labels: strayYears.map(y => '民' + y),
+    datasets: [{
+      label: '流浪犬（萬）',
+      data: strayCounts,
+      backgroundColor: strayYears.map((_, i) => i === strayYears.length-1 ? rust : 'rgba(168,76,46,0.3)'),
+      borderColor: strayYears.map((_, i) => i === strayYears.length-1 ? rust : 'rgba(168,76,46,0.5)'),
+      borderWidth: 1.5,
+      borderRadius: 4
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => '流浪犬：' + ctx.raw.toFixed(2) + ' 萬頭'
+        }
+      }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#A89880', font: { size: 11 } } },
+      y: {
+        grid: { color: 'rgba(107,87,68,0.07)' },
+        ticks: { color: '#A89880', font: { size: 11 }, callback: v => v + ' 萬' },
+        min: 0, max: 20
+      }
+    }
+  }
+});
+
+// ── COUNTY CHART ──
+const countyNames = countyData.map(d => d.name);
+const countyVals = countyData.map(d => d.val);
+new Chart(document.getElementById('countyChart'), {
+  type: 'bar',
+  data: {
+    labels: countyNames,
+    datasets: [{
+      label: '流浪犬數（頭）',
+      data: countyVals,
+      backgroundColor: countyVals.map((v, i) => {
+        if(i === 0) return teal;
+        if(i <= 2) return 'rgba(42,122,107,0.6)';
+        return 'rgba(42,122,107,0.3)';
+      }),
+      borderRadius: 3,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => '流浪犬：' + ctx.raw.toLocaleString() + ' 頭'
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(107,87,68,0.07)' },
+        ticks: { color: '#A89880', font: { size: 10 }, callback: v => v.toLocaleString() }
+      },
+      y: { grid: { display: false }, ticks: { color: '#3D2B1F', font: { size: 11 } } }
+    }
+  }
+});
+
+// ── COUNTY BAR CHART (manual) ──
+const top10 = countyData.slice(0,10);
+const maxVal = top10[0].val;
+const barsEl = document.getElementById('countyBars');
+top10.forEach(d => {
+  const pct = (d.val / maxVal * 100).toFixed(1);
+  barsEl.innerHTML += `
+    <div class="county-bar-item">
+      <div class="county-bar-label">${d.name}</div>
+      <div class="county-bar-track">
+        <div class="county-bar-fill" style="width:${pct}%"></div>
+      </div>
+      <div class="county-bar-val">${d.val.toLocaleString()}</div>
+    </div>`;
+});
+
+// Animate bars on scroll
+const barObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting) {
+      document.querySelectorAll('.county-bar-fill').forEach(b => {
+        b.style.width = b.style.width;
+      });
+    }
+  });
+}, {threshold: 0.2});
+if(barsEl) barObserver.observe(barsEl);
+</script>
+</body>
+</html>
